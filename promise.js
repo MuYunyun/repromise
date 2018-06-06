@@ -3,16 +3,10 @@ class Promise {
     this.resolver = resolver
     this.state = 'PENDING'
     this.data = undefined
-    // this.callbackArr = []
+    this.callbackArr = []
     if (typeof(resolver) === 'function') {
       this.excuteResolve(resolver)
     }
-
-    this.excuteResolve = this.excuteResolve.bind(this)
-    this.excuteCallback = this.excuteCallback.bind(this)
-    this.excuteAsyncCallback = this.excuteAsyncCallback.bind(this)
-    this.then = this.then.bind(this)
-    this.getThen = this.getThen.bind(this)
   }
 
   excuteResolve(resolver) {
@@ -54,15 +48,16 @@ class Promise {
     } else {
       this.state = isResolve ? 'RESOLVED' : 'REJECTED'
       this.data = value
-      // this.callbackArr.forEach(fn => fn[type](value))
+      this.callbackArr.forEach(fn => fn[type](value)) // ④
     }
+    // return this
   }
 
   excuteAsyncCallback(callback, value) {
     const that = this
-    setTimeout(() => {
+    setTimeout(function() {
       const res = callback(value)
-      that.excuteCallback('resolve', res)
+      that.excuteCallback('resolve', res) // 事件循环的知识点需巩固：比较巧妙 ③ ⑥
     }, 4)
   }
 
@@ -71,29 +66,29 @@ class Promise {
     (typeof(onRejected) !== 'function' && this.state === 'REJECTED')) {
       return this
     }
-    const promise = new this.constructor() // 返回构造函数
-    if (this.state !== 'PENDING') {
+    const promise = new this.constructor() // 创建一个新的 promise 实例，作用一：链式调用；作用二：传进 CallbackItem 中，使其能调用 Promise 的方法
+    if (this.state !== 'PENDING') {        // 第一次进入 then，状态是 RESOLVED 或者是 REJECTED
       const callback = this.state === 'RESOLVED' ? onResolved : onRejected
-      this.excuteAsyncCallback(callback, this.data)
+      this.excuteAsyncCallback.call(promise, callback, this.data)  // 绑定 this 到 promise                    ①
+    } else {                               // 从第二次开始以后，进入 then，状态是 PENDING
+      this.callbackArr.push(new CallbackItem(promise, onResolved, onRejected)) // 这里的 this 也是指向‘上一个’ promise ②
     }
-    // else {  // 疑问：什么时候能进这个分支
-    //   this.callbackArr.push(new CallbackItem(onResolved, onRejected))
-    // }
     return promise
   }
 }
 
-// class CallbackItem {
-//   constructor(onResolve, onReject) {
-//     this.onResolve = typeof(onResolve) === 'function' ? onResolve : (resolve) => {}
-//     this.onReject = typeof(onRejected) === 'function' ? onRejected : (rejected) => {}
-//   }
+class CallbackItem {
+  constructor(promise, onResolve, onReject) {
+    this.promise = promise // 相应地，这里存储的 promise 是来自下一个 then 的
+    this.onResolve = typeof(onResolve) === 'function' ? onResolve : (resolve) => {}
+    this.onReject = typeof(onRejected) === 'function' ? onRejected : (rejected) => {}
+  }
 
-//   resolve() {
+  resolve(value) {
+    this.promise.excuteAsyncCallback(this.onResolve, value) // ⑤
+  }
 
-//   }
-
-//   reject() {
-
-//   }
-// }
+  reject(value) {
+    this.promise.excuteAsyncCallback(this.onReject, value)
+  }
+}

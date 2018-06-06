@@ -8,7 +8,7 @@
 </head>
 <body>
   <script src="./promise.js"></script>
-  <!-- <script src="./test1.js"></script> -->
+  <!-- <script src="./test.js"></script> -->
   <script>
     // 这段代码只是为了演示 Promise 的用法，运行在浏览器端
     function pms1() {
@@ -18,12 +18,12 @@
       })
     }
 
-    // function pms2() {
-    //   return new Promise(function (resolve, reject) {
-    //     console.log('执行任务2')
-    //     resolve('执行任务2成功')
-    //   })
-    // }
+    function pms2() {
+      return new Promise(function (resolve, reject) {
+        console.log('执行任务2')
+        resolve('执行任务2成功')
+      })
+    }
 
     // function pms3() {
     //   return new Promise(function (resolve, reject) {
@@ -52,6 +52,16 @@
     pms1()
       .then(function (data) {
         console.log(`第一个回调：${data}`)
+      })
+      .then(function (data) {
+        // console.log('第二个回调：' + data)
+        console.log('第二个回调：')
+        // return pms3()
+      })
+      .then(function (data) {
+        // console.log('第三个回调：' + data)
+        console.log('第三个回调：')
+        // return '哈哈，终于结束了'
       })
   </script>
 </body>
