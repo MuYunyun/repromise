@@ -76,6 +76,10 @@ class Promise {
     }
     return promise
   }
+
+  catch(onRejected) {
+    this.then(null, onRejected)
+  }
 }
 
 class CallbackItem {
@@ -101,3 +105,24 @@ Promise.resolve = function (value) {
 Promise.reject = function (value) {
   return Promise.prototype.excuteCallback.call(new Promise(), 'reject', value)
 }
+
+Promise.all = function(arr) {
+  return new this(function (resolve, reject) {
+    let res = []
+    let count = 0
+    arr.forEach((value, index) => {
+      Promise.resolve(value).then((onResolved) => {
+        res[index] = onResolved
+        count++
+        if (count === arr.length) {
+          return resolve(res)
+        }
+      })
+    })
+  })
+}
+
+Promise.race = function(arr) {
+
+}
+

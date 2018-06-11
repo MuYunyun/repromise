@@ -4,9 +4,9 @@ The project is aim to realize promise with the Promise/A+.
 
 ### feature
 
--[ ] writen in ES6
+-[x] writen in ES6
 
--[ ] Promise.all
+-[x] Promise.all
 
 -[ ] Promise.race
 
@@ -77,3 +77,4 @@ class CallbackItem {
 -[x] 连续 then 调用
 -[x] resolve(Promise.resolve(1))
 -[x] resolve(Promise.resolve(1)) + 连续 then 调用
+-[x] Promise.all()

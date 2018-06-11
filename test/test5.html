@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+
+<body>
+  <script src="../promise.js"></script>
+  <script>
+    // 测试 Promise.all([])
+    var p1 = Promise.resolve(3)
+    var p2 = new Promise((resolve, reject) => {
+      setTimeout(resolve, 2000, 'foo')
+    })
+    var p3 = 1337
+
+    Promise.all([p1, p2, p3]).then(values => {
+      console.log(values); // [3, "foo", 1337]
+    });
+  </script>
+</body>
+</html>
