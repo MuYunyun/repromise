@@ -11,6 +11,7 @@
   <!-- <script src="./test.js"></script> -->
   <script>
     // 这段代码只是为了演示 Promise 的用法，运行在浏览器端
+    // var test = Promise.resolve('执行任务二成功')
     function pms1() {
       return new Promise(function (resolve, reject) {
         console.log('执行任务1')
@@ -18,12 +19,12 @@
       })
     }
 
-    function pms2() {
-      return new Promise(function (resolve, reject) {
-        console.log('执行任务2')
-        resolve('执行任务2成功')
-      })
-    }
+    // function pms2() {
+    //   return new Promise(function (resolve, reject) {
+    //     console.log('执行任务2')
+    //     resolve(test)
+    //   })
+    // }
 
     // function pms3() {
     //   return new Promise(function (resolve, reject) {
@@ -51,17 +52,19 @@
 
     pms1()
       .then(function (data) {
-        console.log(`第一个回调：${data}`)
+        console.log('第一个回调：' + data)
+        return pms2()
       })
       .then(function (data) {
-        // console.log('第二个回调：' + data)
-        console.log('第二个回调：')
-        // return pms3()
+        console.log('第二个回调：' + data)
+        return pms3()
       })
       .then(function (data) {
-        // console.log('第三个回调：' + data)
-        console.log('第三个回调：')
-        // return '哈哈，终于结束了'
+        console.log('第三个回调：' + data)
+        return '哈哈，终于结束了'
+      })
+      .then(function (data) {
+        console.log(data)
       })
   </script>
 </body>

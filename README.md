@@ -65,47 +65,15 @@ class CallbackItem {
 }
 ```
 
-### 开发进度
+#### 坑点 3：resolve(Promise.resolve(1))
 
-- [x] 测试1
+类似这种有循环嵌套的 Promise 的处理稍微有些抽象，日后有好的理解方式再续。
 
-- [x] 测试2
+### 测试
 
-测试1：
+这个测试步骤也是开发步骤
 
-```js
-function pms1() {
-  return new Promise(function (resolve, reject) {
-    console.log('执行任务1')
-    resolve('执行任务1成功')
-  })
-}
-
-pms1()
-  .then(function (data) {
-    console.log(`第一个回调：${data}`)
-  })
-
-// 执行任务1
-// 第一个回调：执行任务1成功
-```
-
-测试2：连续 then 调用
-
-```js
-pms1()
-  .then(function (data) {
-    console.log(`第一个回调：${data}`)
-  })
-  .then(function (data) {
-    console.log('第二个回调：')
-  })
-  .then(function (data) {
-    console.log('第三个回调：')
-  })
-
-// 执行任务1
-// 第一个回调：执行任务1成功
-// 第二个回调：
-// 第三个回调：
-```
+-[x] 基础测试
+-[x] 连续 then 调用
+-[x] resolve(Promise.resolve(1))
+-[x] resolve(Promise.resolve(1)) + 连续 then 调用

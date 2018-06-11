@@ -29,11 +29,12 @@ class Promise {
     resolver(resolve, reject)
   }
 
+  // 获取 thenable 对象
   getThen(value) {
     if (typeof(value) === 'object' && typeof(value.then) === 'function') {
       const that = this
       return function() {
-        that.excuteResolve(value.then)
+        value.then.apply(value, arguments)
       }
     } else {
       return false
@@ -44,20 +45,20 @@ class Promise {
     const isResolve = type === 'resolve'
     const thenable = this.getThen(value)
     if (thenable) { // 如果是 thenable 对象
-      thenable()
+      this.excuteResolve(thenable) // 最终会将 thenable 对象里的值个抽出到 this.data 中
     } else {
       this.state = isResolve ? 'RESOLVED' : 'REJECTED'
       this.data = value
       this.callbackArr.forEach(fn => fn[type](value)) // ④
     }
-    // return this
+    return this // 直接调用 Promise.resolve() Promise.reject() 用得到
   }
 
   excuteAsyncCallback(callback, value) {
     const that = this
     setTimeout(function() {
       const res = callback(value)
-      that.excuteCallback('resolve', res) // 事件循环的知识点需巩固：比较巧妙 ③ ⑥
+      that.excuteCallback('resolve', res) // 事件循环知识点需巩固：比较巧妙 ③ ⑥
     }, 4)
   }
 
@@ -67,7 +68,7 @@ class Promise {
       return this
     }
     const promise = new this.constructor() // 创建一个新的 promise 实例，作用一：链式调用；作用二：传进 CallbackItem 中，使其能调用 Promise 的方法
-    if (this.state !== 'PENDING') {        // 第一次进入 then，状态是 RESOLVED 或者是 REJECTED
+    if (this.state !== 'PENDING') {        // 第一次进入 then，状态是 RESOLVED 或者是 REJECTED ||
       const callback = this.state === 'RESOLVED' ? onResolved : onRejected
       this.excuteAsyncCallback.call(promise, callback, this.data)  // 绑定 this 到 promise                    ①
     } else {                               // 从第二次开始以后，进入 then，状态是 PENDING
@@ -91,4 +92,12 @@ class CallbackItem {
   reject(value) {
     this.promise.excuteAsyncCallback(this.onReject, value)
   }
+}
+
+Promise.resolve = function (value) {
+  return Promise.prototype.excuteCallback.call(new Promise(), 'resolve', value)
+}
+
+Promise.reject = function (value) {
+  return Promise.prototype.excuteCallback.call(new Promise(), 'reject', value)
 }
