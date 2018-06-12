@@ -1,14 +1,40 @@
 # super-promise
 
-The project is aim to realize promise with the Promise/A+.
+The project is aim to understand the Promise/A+ better and try to realize an experimental version.
 
 ### feature
 
 - [x] writen in ES6
 
-- [x] Promise.all
+- [x] Promise.resolve: 返回一个状态为 RESOLVED 的 promise 对象
 
-- [x] Promise.race
+- [x] Promise.all(arr): 当数组内所有元素状态都发生改变后，按照顺序返回结果数组
+
+```js
+var p1 = Promise.resolve(3)
+var p2 = new Promise((resolve, reject) => {
+  setTimeout(resolve, 2000, 'foo')
+})
+var p3 = 1337
+
+Promise.all([p1, p2, p3]).then(values => {
+  console.log(values) // [3, "foo", 1337]
+})
+```
+
+- [x] Promise.race(arr): 提供竞争机制，最早发生状态改变的元素，最先返回
+
+```js
+var p1 = Promise.resolve(1)
+var p2 = new Promise((resolve, reject) => {
+  setTimeout(resolve, 2000, 2)
+})
+var p3 = 3
+
+Promise.race([p1, p2, p3]).then(values => {
+  console.log(values) // 1
+})
+```
 
 ### summary
 

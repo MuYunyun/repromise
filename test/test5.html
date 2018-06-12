@@ -10,17 +10,30 @@
 
 <body>
   <script src="../promise.js"></script>
+  <!-- <script src="../test.js"></script> -->
   <script>
     // 测试 Promise.all([])
-    var p1 = Promise.resolve(3)
-    var p2 = new Promise((resolve, reject) => {
-      setTimeout(resolve, 2000, 'foo')
-    })
-    var p3 = 1337
+    // var p1 = Promise.resolve(3)
+    // var p2 = new Promise((resolve, reject) => {
+    //   setTimeout(resolve, 2000, 'foo')
+    // })
+    // var p3 = 1337
 
-    Promise.all([p1, p2, p3]).then(values => {
-      console.log(values); // [3, "foo", 1337]
-    });
+    // Promise.all([p1, p2, p3]).then(values => {
+    //   console.log(values); // [3, "foo", 1337]
+    // })
+
+    // 测试 Promise.all() 抛错
+    var p1 = 1
+    var p2 = Promise.reject(new Error('this is a error'))
+    // var p2 = Promise.reject(2)
+
+    Promise.all([p1, p2]).then((values) => {
+      console.log(values)
+    }, (err) => {
+      console.log(err)
+    })
+
   </script>
 </body>
 </html>
