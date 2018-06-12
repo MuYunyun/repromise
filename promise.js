@@ -99,19 +99,22 @@ class CallbackItem {
 }
 
 Promise.resolve = function (value) {
-  return Promise.prototype.excuteCallback.call(new Promise(), 'resolve', value)
+  if (value instanceof this) return value // 在 Promise.race 中用到，使 Promise 对象：Promise.resolve(1) 和普通值：3 之间公平竞争。原理：避免下一行进入 setTimeout 回调
+  return this.prototype.excuteCallback.call(new Promise(), 'resolve', value)
 }
 
 Promise.reject = function (value) {
-  return Promise.prototype.excuteCallback.call(new Promise(), 'reject', value)
+  if (value instanceof this) return value
+  return this.prototype.excuteCallback.call(new Promise(), 'reject', value)
 }
 
 Promise.all = function(arr) {
+  const that = this
   return new this(function (resolve, reject) {
     let res = []
     let count = 0
     arr.forEach((value, index) => {
-      Promise.resolve(value).then((onResolved) => {
+      that.resolve(value).then((onResolved) => {
         res[index] = onResolved
         count++
         if (count === arr.length) {
@@ -123,6 +126,16 @@ Promise.all = function(arr) {
 }
 
 Promise.race = function(arr) {
-
+  const that = this
+  return new this(function (resolve, reject) {
+    let flag = false
+    arr.forEach((value, index) => {
+      that.resolve(value).then((onResolved) => {
+        if (!flag) {
+          flag = true
+          resolve(onResolved)
+        }
+      })
+    })
+  })
 }
-
