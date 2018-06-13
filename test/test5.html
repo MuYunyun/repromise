@@ -24,16 +24,27 @@
     // })
 
     // 测试 Promise.all() 抛错
+    // var p1 = 1
+    // var p2 = Promise.reject(new Error('this is a error'))
+    // // var p2 = Promise.reject(2)
+
+    // Promise.all([p1, p2]).then((values) => {
+    //   console.log(values)
+    // }, (err) => {
+    //   console.log(err)
+    // })
+
+    // 测试 catch() 捕获错误
     var p1 = 1
     var p2 = Promise.reject(new Error('this is a error'))
-    // var p2 = Promise.reject(2)
 
-    Promise.all([p1, p2]).then((values) => {
-      console.log(values)
-    }, (err) => {
-      console.log(err)
-    })
-
+    Promise.all([p1, p2])
+      .then((values) => {
+        console.log(values)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
   </script>
 </body>
 </html>

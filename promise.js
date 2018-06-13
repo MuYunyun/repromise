@@ -6,7 +6,6 @@
 
   class Promise {
     constructor(resolver) {
-      this.resolver = resolver
       this.state = PENDING
       this.data = UNDEFINED
       this.callbackArr = []
@@ -63,7 +62,12 @@
     excuteAsyncCallback(callback, value) {
       const that = this
       setTimeout(function () {
-        const res = callback(value)
+        let res
+        try {
+          res = callback(value)
+        } catch(e) {
+          that.executeCallback('reject', e)  // 目的：使捕获到的错误进入 Promise.catch() 中
+        }
         that.executeCallback('resolve', res) // 事件循环知识点需巩固：比较巧妙 ③ ⑥
       }, 4)
     }
@@ -83,24 +87,24 @@
       return promise
     }
 
-    catch (onRejected) {
+    catch(onRejected) {
       this.then(null, onRejected)
     }
   }
 
   class CallbackItem {
-    constructor(promise, onResolve, onReject) {
+    constructor(promise, onResolved, onRejected) {
       this.promise = promise // 相应地，这里存储的 promise 是来自下一个 then 的
-      this.onResolve = typeof (onResolve) === 'function' ? onResolve : (v) => { return v }
-      this.onReject = typeof (onRejected) === 'function' ? onRejected : (err) => { throw err }
+      this.onResolved = typeof (onResolved) === 'function' ? onResolved : (v) => { return v }
+      this.onRejected = typeof (onRejected) === 'function' ? onRejected : (err) => { throw err }
     }
 
     resolve(value) {
-      this.promise.excuteAsyncCallback(this.onResolve, value) // ⑤
+      this.promise.excuteAsyncCallback(this.onResolved, value) // ⑤
     }
 
     reject(value) {
-      this.promise.excuteAsyncCallback(this.onReject, value)
+      this.promise.excuteAsyncCallback(this.onRejected, value)
     }
   }
 
