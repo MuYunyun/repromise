@@ -2,6 +2,14 @@
 
 The project is aim to understand the Promise/A+ better and try to realize an experimental version.
 
+### Promise/A+ 核心
+
+* Promise 操作只会处在 3 种状态的一种：未完成态(pending)、完成态(resolved) 和失败态(rejected);
+* Promise 的状态只会出现从未完成态向完成态或失败态转化;
+* Promise 的状态一旦转化，将不能被更改;
+
+详细地可以参考[Promise/A+规范](https://segmentfault.com/a/1190000002452115#articleHeader3)
+
 ### feature
 
 - [x] writen in ES6
@@ -22,7 +30,7 @@ Promise.all([p1, p2, p3]).then(values => {
 })
 ```
 
-- [x] Promise.race(arr): 提供竞争机制，最早发生状态改变的元素，最先返回
+- [x] Promise.race(arr): 提供竞争机制，返回最早发生状态改变的元素
 
 ```js
 var p1 = Promise.resolve(1)

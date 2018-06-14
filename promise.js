@@ -1,6 +1,6 @@
 (function(scope) {
   const PENDING = 'pending'
-  const RESOLVED = 'resolved'
+  const FULFILLED = 'fulfilled'
   const REJECTED = 'rejected'
   const UNDEFINED = void 0
 
@@ -22,14 +22,14 @@
           return
         }
         cb = true
-        that.executeCallback('resolve', value)
+        that.executeCallback('fulfilled', value)
       }
       const onError = function (value) {
         if (cb) {
           return
         }
         cb = true
-        that.executeCallback('reject', value)
+        that.executeCallback('rejected', value)
       }
       resolver(onSuccess, onError)
     }
@@ -47,12 +47,12 @@
     }
 
     executeCallback(type, value) {
-      const isResolve = type === 'resolve'
+      const isResolve = type === 'fulfilled'
       const thenable = this.getThen(value)
       if (thenable) { // 如果是 thenable 对象
         this.excuteResolve(thenable) // 最终会将 thenable 对象里的值个抽出到 this.data 中
       } else {
-        this.state = isResolve ? RESOLVED : REJECTED
+        this.state = isResolve ? FULFILLED : REJECTED
         this.data = value
         this.callbackArr.forEach(fn => fn[type](value)) // ④
       }
@@ -66,20 +66,20 @@
         try {
           res = callback(value)
         } catch(e) {
-          that.executeCallback('reject', e)  // 目的：使捕获到的错误进入 Promise.catch() 中
+          that.executeCallback('rejected', e) // 目的：使捕获到的错误进入 Promise.catch() 中
         }
-        that.executeCallback('resolve', res) // 事件循环知识点需巩固：比较巧妙 ③ ⑥
+        that.executeCallback('fulfilled', res) // 事件循环知识点需巩固：比较巧妙 ③ ⑥
       }, 4)
     }
 
     then(onResolved, onRejected) {
-      if ((typeof (onResolved) !== 'function' && this.state === RESOLVED) ||
+      if ((typeof (onResolved) !== 'function' && this.state === FULFILLED) ||
         (typeof (onRejected) !== 'function' && this.state === REJECTED)) {
         return this
       }
       const promise = new this.constructor() // 创建一个新的 promise 实例，作用一：链式调用；作用二：传进 CallbackItem 中，使其能调用 Promise 的方法
-      if (this.state !== PENDING) { // 第一次进入 then，状态是 RESOLVED 或者是 REJECTED ||
-        const callback = this.state === RESOLVED ? onResolved : onRejected
+      if (this.state !== PENDING) { // 第一次进入 then，状态是 FULFILLED 或者是 REJECTED ||
+        const callback = this.state === FULFILLED ? onResolved : onRejected
         this.excuteAsyncCallback.call(promise, callback, this.data) // 绑定 this 到 promise                    ①
       } else { // 从第二次开始以后，进入 then，状态是 PENDING
         this.callbackArr.push(new CallbackItem(promise, onResolved, onRejected)) // 这里的 this 也是指向‘上一个’ promise ②
@@ -99,23 +99,23 @@
       this.onRejected = typeof (onRejected) === 'function' ? onRejected : (err) => { throw err }
     }
 
-    resolve(value) {
+    fulfilled(value) {
       this.promise.excuteAsyncCallback(this.onResolved, value) // ⑤
     }
 
-    reject(value) {
+    rejected(value) {
       this.promise.excuteAsyncCallback(this.onRejected, value)
     }
   }
 
   Promise.resolve = function (value) {
     if (value instanceof this) return value // 在 Promise.race 中用到，使 Promise 对象：Promise.resolve(1) 和普通值：3 之间公平竞争。原理：避免下一行进入 setTimeout 回调
-    return this.prototype.executeCallback.call(new Promise(), 'resolve', value)
+    return this.prototype.executeCallback.call(new Promise(), 'fulfilled', value)
   }
 
   Promise.reject = function (value) {
     if (value instanceof this) return value
-    return this.prototype.executeCallback.call(new Promise(), 'reject', value)
+    return this.prototype.executeCallback.call(new Promise(), 'rejected', value)
   }
 
   Promise.all = function (arr) {
