@@ -2,12 +2,11 @@
   const PENDING = 'pending'
   const FULFILLED = 'fulfilled'
   const REJECTED = 'rejected'
-  const UNDEFINED = void 0
 
   class Promise {
     constructor(resolver) {
       this.state = PENDING
-      this.data = UNDEFINED
+      this.data = undefined
       this.callbackArr = []
       if (typeof (resolver) === 'function') {
         this.excuteResolve(resolver)
@@ -31,7 +30,11 @@
         cb = true
         that.executeCallback('rejected', value)
       }
-      resolver(onSuccess, onError)
+      try {
+        resolver(onSuccess, onError)
+      } catch(e) {
+        that.executeCallback('rejected', e) // new Promise() 中抛错
+      }
     }
 
     // 获取 thenable 对象
@@ -49,9 +52,9 @@
     executeCallback(type, value) {
       const isResolve = type === 'fulfilled'
       const thenable = this.getThen(value)
-      if (thenable) { // 如果是 thenable 对象
-        this.excuteResolve(thenable) // 最终会将 thenable 对象里的值个抽出到 this.data 中
-      } else {
+      if (thenable) {                       // 如果是 thenable 对象
+        this.excuteResolve(thenable)        // 最终会将 thenable 对象里的值个抽出到 this.data 中
+      } else if (this.state === PENDING) {  // promise 状态一旦改变便不可更改
         this.state = isResolve ? FULFILLED : REJECTED
         this.data = value
         this.callbackArr.forEach(fn => fn[type](value)) // ④
