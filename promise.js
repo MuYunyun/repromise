@@ -52,7 +52,7 @@
     executeCallback(type, value) {
       const isResolve = type === 'fulfilled'
       const thenable = this.getThen(value)
-      if (thenable) {                       // 如果是 thenable 对象
+      if (isResolve && thenable) {          // 如果是 thenable 对象而且是 fulfilled 状态(Promise.reject() 会返回参数值)
         this.excuteResolve(thenable)        // 最终会将 thenable 对象里的值个抽出到 this.data 中
       } else if (this.state === PENDING) {  // promise 状态一旦改变便不可更改
         this.state = isResolve ? FULFILLED : REJECTED
@@ -92,6 +92,12 @@
 
     catch(onRejected) {
       return this.then(null, onRejected) // 加上 return，相当于返回 promise
+    }
+
+    done(onResolved, onRejected) { // 非 ES6 标准
+      this.then(onResolved, onRejected).catch((reason) => {
+        setTimeout(() => {throw reason}, 0)
+      })
     }
   }
 

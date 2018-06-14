@@ -14,35 +14,19 @@ The project is aim to understand the Promise/A+ better and try to realize an exp
 
 - [x] writen in ES6
 
-- [x] Promise.resolve: 返回一个状态为 RESOLVED 的 promise 对象
+- [x] Promise.resolve(): 返回一个状态为 RESOLVED 的 promise 对象
+
+- [x] Promise.reject(): 返回一个状态为 RESOLVED 的 promise 对象
 
 - [x] Promise.all(arr): 当数组内所有元素状态都发生改变后，按照顺序返回结果数组
 
-```js
-var p1 = Promise.resolve(3)
-var p2 = new Promise((resolve, reject) => {
-  setTimeout(resolve, 2000, 'foo')
-})
-var p3 = 1337
-
-Promise.all([p1, p2, p3]).then(values => {
-  console.log(values) // [3, "foo", 1337]
-})
-```
-
 - [x] Promise.race(arr): 提供竞争机制，返回最早发生状态改变的元素
 
-```js
-var p1 = Promise.resolve(1)
-var p2 = new Promise((resolve, reject) => {
-  setTimeout(resolve, 2000, 2)
-})
-var p3 = 3
+- [x] then: 链式调用
 
-Promise.race([p1, p2, p3]).then(values => {
-  console.log(values) // 1
-})
-```
+- [x] catch: 错误捕获
+
+- [x] done: 最终错误捕获
 
 ### summary
 
@@ -99,9 +83,16 @@ class CallbackItem {
 }
 ```
 
-#### 坑点 3：resolve(Promise.resolve(1))
+#### 坑点 3：测试用例 test4.html
 
-类似这种有循环嵌套的 Promise 的处理稍微有些抽象，日后有好的理解方式再续。
+```js
+new Promise((resolve, reject) => {resolve(Promise.resolve(1))})
+```
+
+类似这种结构的处理稍微有些复杂，日后有好的理解方式再续。调试完代码的感触是：
+
+1. 还是事件循环
+2. 还是要理清各个闭包存的 that(this) 值
 
 ### 测试
 
