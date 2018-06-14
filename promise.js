@@ -91,7 +91,7 @@
     }
 
     catch(onRejected) {
-      this.then(null, onRejected)
+      return this.then(null, onRejected) // 加上 return，相当于返回 promise
     }
   }
 
