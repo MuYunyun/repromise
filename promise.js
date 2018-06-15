@@ -39,7 +39,7 @@
 
     // 获取 thenable 对象
     getThen(value) {
-      if (typeof (value) === 'object' && typeof (value.then) === 'function') {
+      if (typeof(value) === 'object' && typeof(value.then) === 'function') {
         const that = this
         return function () {
           value.then.apply(value, arguments)
@@ -77,7 +77,7 @@
 
     then(onResolved, onRejected) {
       if ((typeof (onResolved) !== 'function' && this.state === FULFILLED) ||
-        (typeof (onRejected) !== 'function' && this.state === REJECTED)) {
+        (typeof (onRejected) !== 'function' && this.state === REJECTED)) { // 配合 done() 食用
         return this
       }
       const promise = new this.constructor() // 创建一个新的 promise 实例，作用一：链式调用；作用二：传进 CallbackItem 中，使其能调用 Promise 的方法
@@ -95,9 +95,10 @@
     }
 
     done(onResolved, onRejected) { // 非 ES6 标准
-      this.then(onResolved, onRejected).catch((reason) => {
-        setTimeout(() => {throw reason}, 0)
-      })
+      this.then(onResolved, onRejected)
+        .catch((reason) => {
+          setTimeout(() => {throw reason}, 0)
+        })
     }
   }
 

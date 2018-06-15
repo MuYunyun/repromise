@@ -24,9 +24,9 @@ The project is aim to understand the Promise/A+ better and try to realize an exp
 
 - [x] then: 链式调用
 
-- [x] catch: 错误捕获
+- [x] catch((err) => {}): 错误捕获
 
-- [x] done: 最终错误捕获
+- [x] done((fulfilled) => {}, (err) => {}): 最终错误捕获, 参数可选
 
 ### summary
 
@@ -104,3 +104,5 @@ new Promise((resolve, reject) => {resolve(Promise.resolve(1))})
 - [x] resolve(Promise.resolve(1)) + 连续 then 调用
 - [x] Promise.all()
 - [x] Promise.race()
+
+使用了 [promises-aplus-tests](https://github.com/promises-aplus/promises-tests/blob/master/README.md) 进行用例的测试
