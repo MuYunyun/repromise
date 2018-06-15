@@ -105,4 +105,10 @@ new Promise((resolve, reject) => {resolve(Promise.resolve(1))})
 - [x] Promise.all()
 - [x] Promise.race()
 
-使用了 [promises-aplus-tests](https://github.com/promises-aplus/promises-tests/blob/master/README.md) 进行用例的测试
+此外使用了 [promises-aplus-tests](https://github.com/promises-aplus/promises-tests/blob/master/README.md) 进行相对全面的 Promise/A+ 规范的用例测试，跑通了其提供的全部用例，结果如下：
+
+![](http://oqhtscus0.bkt.clouddn.com/6f977ef37d7577217bcbe74c1b9b5e1b.jpg)
+
+### 关于使用
+
+该项目目前定位成学习项目，后续继续完善后拿到项目中溜溜😁
