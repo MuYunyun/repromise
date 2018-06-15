@@ -5,6 +5,9 @@
 
   class Promise {
     constructor(resolver) {
+      if (resolver && typeof resolver !== 'function') {
+        throw new Error(`Promise resolver ${resolver} is not a function`)
+      }
       this.state = PENDING
       this.data = undefined
       this.callbackArr = []
@@ -33,16 +36,17 @@
       try {
         resolver(onSuccess, onError)
       } catch(e) {
-        that.executeCallback('rejected', e) // new Promise() 中抛错
+        onError(e) // new Promise() 中抛错, 这里不用 that.executeCallback('rejected', e)，有错误的话提前终止不进入 onSuccess/onError
       }
     }
 
     // 获取 thenable 对象
     getThen(value) {
-      if (typeof(value) === 'object' && typeof(value.then) === 'function') {
+      const then = value.then // 2.3.3.1 避免 then 内 get 方法多次的调用，对应特殊测试.html
+      if (Object.prototype.toString.call(value) === '[object Object]' && typeof(then) === 'function') {
         const that = this
         return function () {
-          value.then.apply(value, arguments)
+          then.apply(value, arguments)
         }
       } else {
         return false
@@ -51,8 +55,15 @@
 
     executeCallback(type, value) {
       const isResolve = type === 'fulfilled'
-      const thenable = this.getThen(value)
-      if (isResolve && thenable) {          // 如果是 thenable 对象而且是 fulfilled 状态(Promise.reject() 会返回参数值)
+      let thenable
+      if (isResolve && (Object.prototype.toString.call(value) === '[object Object]') || (typeof (value) === 'function')) {
+        try {
+          thenable = this.getThen(value)
+        } catch(e) {
+          return this.executeCallback.call(this, 'rejected', e)
+        }
+      }
+      if (isResolve && thenable) {          // 如果是 thenable 对象而且是 fulfilled 状态(Promise.reject() 会返回参数值
         this.excuteResolve(thenable)        // 最终会将 thenable 对象里的值个抽出到 this.data 中
       } else if (this.state === PENDING) {  // promise 状态一旦改变便不可更改
         this.state = isResolve ? FULFILLED : REJECTED
@@ -71,7 +82,11 @@
         } catch(e) {
           that.executeCallback('rejected', e) // 目的：使捕获到的错误进入 Promise.catch() 中
         }
-        that.executeCallback('fulfilled', res) // 事件循环知识点需巩固：比较巧妙 ③ ⑥
+        if (res === that) {  // 2.3.1 如果放回的值与原 promise 相等，则是无穷循环
+          that.executeCallback('rejected', new TypeError('Chaining cycle detected for promise #<Promise>'))
+        } else {
+          that.executeCallback('fulfilled', res) // 事件循环知识点需巩固：比较巧妙 ③ ⑥
+        }
       }, 4)
     }
 
@@ -167,7 +182,7 @@
 
   // 测试 Promise: https://github.com/promises-aplus/promises-tests/blob/master/README.md
   Promise.deferred = Promise.defer = function () {
-    var dfd = {};
+    const dfd = {};
     dfd.promise = new Promise(function (resolve, reject) {
       dfd.resolve = resolve;
       dfd.reject = reject;
