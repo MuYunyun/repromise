@@ -190,6 +190,21 @@
     return dfd
   }
 
+  Promise.wrap = function(fn) {
+    return function() {
+      const args = [].slice.call(arguments)
+      return new Promise((resolve, reject) => {
+        fn.apply(null, args.concat((err, data) => {
+          if (err) {
+            reject(err)
+          } else {
+            resolve(data)
+          }
+        }))
+      })
+    }
+  }
+
   try {
     module.exports = Promise
   } catch (e) {

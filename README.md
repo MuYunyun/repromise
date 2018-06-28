@@ -1,4 +1,4 @@
-# super-promise
+# repromise
 
 The project is aim to understand the Promise/A+ better and try to realize an experimental version.
 
@@ -10,9 +10,7 @@ The project is aim to understand the Promise/A+ better and try to realize an exp
 
 详细地可以参考[Promise/A+规范](https://segmentfault.com/a/1190000002452115#articleHeader3)
 
-### feature
-
-- [x] writen in ES6
+### Feature
 
 - [x] Promise.resolve(): 返回一个状态为 RESOLVED 的 promise 对象
 
@@ -28,7 +26,9 @@ The project is aim to understand the Promise/A+ better and try to realize an exp
 
 - [x] done((fulfilled) => {}, (err) => {}): 最终错误捕获, 参数可选
 
-### summary
+- [x] Promise.wrap(fn): 提供将回调函数 Promise 化的方法
+
+### Summary
 
 #### 坑点 1：事件循环知识点
 
@@ -94,9 +94,9 @@ new Promise((resolve, reject) => {resolve(Promise.resolve(1))})
 1. 还是事件循环
 2. 还是要理清各个闭包存的 that(this) 值
 
-### 测试
+### Test
 
-这个测试步骤也是开发步骤
+测试与开发顺序相同
 
 - [x] 基础测试
 - [x] 连续 then 调用
@@ -109,6 +109,6 @@ new Promise((resolve, reject) => {resolve(Promise.resolve(1))})
 
 ![](http://oqhtscus0.bkt.clouddn.com/6f977ef37d7577217bcbe74c1b9b5e1b.jpg)
 
-### 关于使用
+### Use
 
-该项目目前定位成学习项目，后续继续完善后拿到项目中溜溜😁
+该项目目前定位成学习项目，欢迎 pr😁
