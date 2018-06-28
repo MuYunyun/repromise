@@ -98,12 +98,13 @@ new Promise((resolve, reject) => {resolve(Promise.resolve(1))})
 
 测试与开发顺序相同
 
-- [x] 基础测试
-- [x] 连续 then 调用
-- [x] resolve(Promise.resolve(1))
-- [x] resolve(Promise.resolve(1)) + 连续 then 调用
-- [x] Promise.all()
-- [x] Promise.race()
+* [基础测试](https://github.com/MuYunyun/repromise/blob/master/test/test1.html)
+* [连续 then 调用](https://github.com/MuYunyun/repromise/blob/master/test/test2.html)
+* [resolve(Promise.resolve(1))](https://github.com/MuYunyun/repromise/blob/master/test/test3.html)
+* [resolve(Promise.resolve(1)) + 连续 then 调用](https://github.com/MuYunyun/repromise/blob/master/test/test4.html)
+* [Promise.all](https://github.com/MuYunyun/repromise/blob/master/test/%E6%B5%8B%E8%AF%95promise.all.html)
+* [Promise.race](https://github.com/MuYunyun/repromise/blob/master/test/%E6%B5%8B%E8%AF%95promise.race.html)
+* [Promise.wrap](https://github.com/MuYunyun/repromise/blob/master/test/node/回调函数promise化.js)
 
 此外使用了 [promises-aplus-tests](https://github.com/promises-aplus/promises-tests/blob/master/README.md) 进行相对全面的 Promise/A+ 规范的用例测试，跑通了其提供的全部用例，结果如下：
 
@@ -111,4 +112,4 @@ new Promise((resolve, reject) => {resolve(Promise.resolve(1))})
 
 ### Use
 
-该项目目前定位成学习项目，欢迎 pr😁
+该项目目前定位为学习项目，欢迎 pr😁
