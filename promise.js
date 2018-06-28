@@ -191,8 +191,7 @@
   }
 
   Promise.wrap = function(fn) {
-    return function() {
-      const args = [].slice.call(arguments)
+    return function(...args) {
       return new Promise((resolve, reject) => {
         fn.apply(null, args.concat((err, data) => {
           if (err) {
