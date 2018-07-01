@@ -12,6 +12,8 @@ The project is aim to understand the Promise/A+ better and try to realize an exp
 
 ### Feature
 
+[文档说明](https://github.com/MuYunyun/blog/blob/master/BasicSkill/readES6/Promise%E6%9C%AD%E8%AE%B0.md)
+
 - [x] Promise.resolve(): 返回一个状态为 RESOLVED 的 promise 对象
 
 - [x] Promise.reject(): 返回一个状态为 RESOLVED 的 promise 对象
@@ -30,25 +32,27 @@ The project is aim to understand the Promise/A+ better and try to realize an exp
 
 ### Summary
 
-#### 坑点 1：事件循环知识点
+#### 坑点 1：事件循环
 
-事件循环知识点：同步队列执行完后，在指定时间后再执行异步队列的内容。
+> 事件循环：同步队列执行完后，在指定时间后再执行异步队列的内容。
 
-对应如下代码：① 处执行完并不会马上执行 setTimeout() 中的代码，此时有多少次 then 的调用，就会重新进入 ② 处多少次。
+之所以要单列事件循环，因为代码的执行顺序与其息息相关，此处用 setTimeout 来模拟事件循环；
+
+下面代码片段中，① 处执行完并不会马上执行 setTimeout() 中的代码(③)，而是此时有多少次 then 的调用，就会重新进入 ② 处多少次后，再进入 ③
 
 ```js
 excuteAsyncCallback(callback, value) {
   const that = this
   setTimeout(function() {
-    const res = callback(value)
-    that.excuteCallback('resolve', res) // 事件循环知识点需巩固：比较巧妙 ③
+    const res = callback(value) // ③
+    that.excuteCallback('fulfilled', res)
   }, 4)
 }
 
 then(onResolved, onRejected) {
   const promise = new this.constructor()
   if (this.state !== 'PENDING') {
-    const callback = this.state === 'RESOLVED' ? onResolved : onRejected
+    const callback = this.state === 'fulfilled' ? onResolved : onRejected
     this.excuteAsyncCallback.call(promise, callback, this.data)              // ①
   } else {
     this.callbackArr.push(new CallbackItem(promise, onResolved, onRejected)) // ②
@@ -62,15 +66,19 @@ then(onResolved, onRejected) {
 this.callbackArr.push() 中的 this 指向的是 ‘上一个’ promise，所以类 CallbackItem 中，this.promise 存储的是'下一个' promise(then 对象)。
 
 ```js
-then(onResolved, onRejected) {
-  const promise = new this.constructor()
-  if (this.state !== 'PENDING') {        // 第一次进入 then，状态是 RESOLVED 或者是 REJECTED
-    const callback = this.state === 'RESOLVED' ? onResolved : onRejected
-    this.excuteAsyncCallback.call(promise, callback, this.data)  // 绑定 this 到 promise
-  } else {                               // 从第二次开始以后，进入 then，状态是 PENDING
-    this.callbackArr.push(new CallbackItem(promise, onResolved, onRejected)) // 这里的 this 也是指向‘上一个’ promise
+class Promise {
+  ...
+  then(onResolved, onRejected) {
+    const promise = new this.constructor()
+    if (this.state !== 'PENDING') {        // 第一次进入 then，状态是 RESOLVED 或者是 REJECTED
+      const callback = this.state === 'fulfilled' ? onResolved : onRejected
+      this.excuteAsyncCallback.call(promise, callback, this.data)  // 绑定 this 到 promise
+    } else {                               // 从第二次开始以后，进入 then，状态是 PENDING
+      this.callbackArr.push(new CallbackItem(promise, onResolved, onRejected)) // 这里的 this 也是指向‘上一个’ promise
+    }
+    return promise
   }
-  return promise
+  ...
 }
 
 class CallbackItem {
@@ -112,4 +120,4 @@ new Promise((resolve, reject) => {resolve(Promise.resolve(1))})
 
 ### Use
 
-该项目目前定位为学习项目，欢迎 pr😁
+该项目目前定位为学习项目，欢迎 pr 😁
