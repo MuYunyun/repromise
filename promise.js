@@ -44,7 +44,6 @@
     getThen(value) {
       const then = value.then // 2.3.3.1 避免 then 内 get 方法多次的调用，对应特殊测试.html
       if (Object.prototype.toString.call(value) === '[object Object]' && typeof(then) === 'function') {
-        const that = this
         return function () {
           then.apply(value, arguments)
         }
