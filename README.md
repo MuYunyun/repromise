@@ -32,7 +32,7 @@ The project is aim to understand the Promise/A+ better and try to realize an exp
 
 ### Summary
 
-#### 坑点 1：事件循环
+#### 坑点 1: 事件循环
 
 > 事件循环：同步队列执行完后，在指定时间后再执行异步队列的内容。
 
@@ -61,7 +61,7 @@ then(onResolved, onRejected) {
 }
 ```
 
-#### 坑点 2：this 的指向问题
+#### 坑点 2: this 的指向问题
 
 this.callbackArr.push() 中的 this 指向的是 ‘上一个’ promise，所以类 CallbackItem 中，this.promise 存储的是'下一个' promise(then 对象)。
 
@@ -91,7 +91,7 @@ class CallbackItem {
 }
 ```
 
-#### 坑点 3：测试用例 test4.html
+#### 坑点 3: 测试用例 test4.html
 
 ```js
 new Promise((resolve, reject) => {resolve(Promise.resolve(1))})
@@ -101,6 +101,16 @@ new Promise((resolve, reject) => {resolve(Promise.resolve(1))})
 
 1. 还是事件循环
 2. 还是要理清各个闭包存的 that(this) 值
+
+#### 问题: promise.all 如何做到让多个 setTimeout 并发运行?
+
+这个就是 promise.all() 的本质了，浏览器内部提供了一个事件循环机制来模拟成伪'并发'
+
+```js
+var oldTime = Date.now()
+setTimeout(() => {console.log(Date.now() - oldTime)}, 1000) // 1001 ~ 1005(存在 4ms 的波动)
+setTimeout(() => {console.log(Date.now() - oldTime)}, 2000) // 2001 ~ 2005
+```
 
 ### Test
 

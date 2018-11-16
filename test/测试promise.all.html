@@ -12,16 +12,21 @@
   <script src="../promise.js"></script>
   <!-- <script src="../test.js"></script> -->
   <script>
-    // 测试 Promise.all([])
-    var p1 = Promise.resolve(3)
-    var p2 = new Promise((resolve, reject) => {
+    Promise.all([new Promise((resolve, reject) => {
       setTimeout(resolve, 2000, 'foo')
-    })
-    var p3 = 1337
+    }), new Promise((resolve, reject) => {
+      setTimeout(resolve, 3000, 'boo')
+    })]).then(values => { console.log(values) })
+    // 测试 Promise.all([])
+    // var p1 = Promise.resolve(3)
+    // var p2 = new Promise((resolve, reject) => {
+    //   setTimeout(resolve, 2000, 'foo')
+    // })
+    // var p3 = 1337
 
-    Promise.all([p1, p2, p3]).then(values => {
-      console.log(values); // [3, "foo", 1337]
-    })
+    // Promise.all([p1, p2, p3]).then(values => {
+    //   console.log(values); // [3, "foo", 1337]
+    // })
 
     // 测试 Promise.all() 抛错
     // var p1 = 1
